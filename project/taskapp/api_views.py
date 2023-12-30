@@ -111,7 +111,6 @@ def task_assignment(request) :
     
     elif request.method == 'POST' :
         data = request.data
-        print("**********", data['title'], data['assigned_to'], data['assigned_by'])
 
         task = Task.objects.filter(title = data['title'])
 
@@ -120,6 +119,8 @@ def task_assignment(request) :
         subordinate_pk = subordinate.pk
         lead_pk = lead.pk
 
+        # Used try except block to ensure only leads can assign tasks to subordinates and
+        # no lead can assign task to other lead.
         try :
             subordinate = Subordinate.objects.get(pk=subordinate_pk)
         except Subordinate.DoesNotExist :
@@ -130,9 +131,13 @@ def task_assignment(request) :
         except Lead.DoesNotExist :
             error_message = "Enter correct lead email. Leads can assign task(s) to subordinates but not vice-versa."
             return Response(error_message)
+        
+        # To ensure that a task cannot be assigned to the same employee more than once.
+        is_assigned = Task.objects.filter(title=data['title'], assigned_to = subordinate).exists()
 
-        task.update(assigned_to = subordinate, assigned_by = lead)
-
-
-        return Response({'Status': f"Task: {data['title']} assigned to {data['assigned_to']} by {data['assigned_by']}"})
+        if is_assigned :
+            return Response({'Error message': 'Same task cannot be assigned to a subordinate more than once.'})
+        else :
+            task.update(assigned_to = subordinate, assigned_by = lead)
+            return Response({'Status': f"Task: {data['title']} assigned to {data['assigned_to']} by {data['assigned_by']}"})
 
