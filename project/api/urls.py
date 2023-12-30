@@ -6,4 +6,5 @@ urlpatterns = [
     path('employee_management/', employee_management),
     path('task_management/', task_management),
     path('task_assignment/', task_assignment),
+    path('task_unassignment/', task_unassignment),
 ]

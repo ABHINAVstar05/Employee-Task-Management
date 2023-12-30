@@ -141,3 +141,24 @@ def task_assignment(request) :
             task.update(assigned_to = subordinate, assigned_by = lead)
             return Response({'Status': f"Task: {data['title']} assigned to {data['assigned_to']} by {data['assigned_by']}"})
 
+
+# API view for task unassignment
+        
+"""
+1.) Used to see tasks which are assigned to some subordinate.
+2.) Used to unassign the tasks from Subordinates.
+"""
+
+@api_view(['GET', 'POST'])
+def task_unassignment(request) :
+    if request.method == 'GET' :
+        tasks = Task.objects.filter(assigned_to__isnull=False)
+        serialized = TaskSerializer(tasks, many=True)
+        return Response(serialized.data)
+    
+    elif request.method == 'POST' :
+        data = request.data
+
+        task = Task.objects.filter(title = data['title'])
+        task.update(assigned_to = None, assigned_by = None)
+        return Response({'Status': 'Task unassigned successfully.'})
