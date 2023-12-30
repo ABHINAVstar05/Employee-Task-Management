@@ -39,7 +39,7 @@ class Lead(models.Model):
     
 
 class Task(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, unique = True)
     deadline = models.DateField()
     assigned_to = models.ForeignKey(Subordinate, on_delete=models.SET_NULL, related_name='tasks_assigned', null=True, blank=True)
     assigned_by = models.ForeignKey(Lead, on_delete=models.SET_NULL, related_name='tasks_assigned', null=True, blank=True)

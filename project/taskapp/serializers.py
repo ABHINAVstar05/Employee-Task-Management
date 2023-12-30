@@ -2,11 +2,6 @@ from rest_framework import serializers
 
 from taskapp.models import *
 
-class EmployeeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Employee
-        fields = '__all__'
-
 
 class LeadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,7 +15,14 @@ class SubordinateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = '__all__'
+
+
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = '__all__'
+        depth = 1
