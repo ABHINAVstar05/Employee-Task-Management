@@ -92,3 +92,47 @@ def task_management(request) :
         except Task.DoesNotExist :
             error_message = "Task does not exist."
             return Response(error_message)
+        
+
+# API endpoint for Task Assignment.
+
+"""
+1.) Used to see tasks which are not assigned to any subordinate.
+2.) Used to assign the tasks to Subordinates by Leads.
+"""
+
+@api_view(['GET', 'POST'])
+def task_assignment(request) :
+    
+    if request.method == 'GET' :
+        tasks = Task.objects.filter(assigned_to__isnull=True)
+        serialized = TaskSerializer(tasks, many=True)
+        return Response(serialized.data)
+    
+    elif request.method == 'POST' :
+        data = request.data
+        print("**********", data['title'], data['assigned_to'], data['assigned_by'])
+
+        task = Task.objects.filter(title = data['title'])
+
+        subordinate = Employee.objects.get(email=data['assigned_to'])
+        lead = Employee.objects.get(email=data['assigned_by'])
+        subordinate_pk = subordinate.pk
+        lead_pk = lead.pk
+
+        try :
+            subordinate = Subordinate.objects.get(pk=subordinate_pk)
+        except Subordinate.DoesNotExist :
+            error_message = "Enter correct subordinate email. Leads can assign task(s) to subordinates but not vice-versa."
+            return Response(error_message)
+        try :
+            lead = Lead.objects.get(pk=lead_pk)
+        except Lead.DoesNotExist :
+            error_message = "Enter correct lead email. Leads can assign task(s) to subordinates but not vice-versa."
+            return Response(error_message)
+
+        task.update(assigned_to = subordinate, assigned_by = lead)
+
+
+        return Response({'Status': f"Task: {data['title']} assigned to {data['assigned_to']} by {data['assigned_by']}"})
+

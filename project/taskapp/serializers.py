@@ -16,9 +16,10 @@ class SubordinateSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
+    subordinate_info = SubordinateSerializer(source='subordinate', read_only=True)
     class Meta:
         model = Employee
-        fields = '__all__'
+        fields = ['name', 'email', 'role', 'subordinate_info']
 
 
 class TaskSerializer(serializers.ModelSerializer):
